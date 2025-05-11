@@ -172,23 +172,25 @@ def webhook():
 def main():
     """Start the bot."""
     try:
-        # Get the URL from environment or use a default for local development
-        webhook_url = os.environ.get('RENDER_EXTERNAL_URL', f'https://your-app-name.onrender.com')
-        webhook_path = f'/{TELEGRAM_BOT_TOKEN}'
+        # Check if running on Render or locally
+        is_render = os.environ.get('RENDER_EXTERNAL_URL') is not None
         
-        # Set up the webhook
-        application.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            url_path=webhook_path,
-            webhook_url=f"{webhook_url}{webhook_path}"
-        )
-        
-        # Run Flask in a separate thread (not needed with webhook mode)
-        # But we'll keep a simplified version for the health check endpoint
-        flask_thread = threading.Thread(target=lambda: app.run(host='0.0.0.0', port=PORT+1))
-        flask_thread.daemon = True
-        flask_thread.start()
+        if is_render:
+            # Running on Render - use webhook mode
+            webhook_url = os.environ.get('RENDER_EXTERNAL_URL')
+            webhook_path = f'/{TELEGRAM_BOT_TOKEN}'
+            
+            logger.info(f"Starting webhook mode on {webhook_url}")
+            application.run_webhook(
+                listen="0.0.0.0",
+                port=PORT,
+                url_path=webhook_path,
+                webhook_url=f"{webhook_url}{webhook_path}"
+            )
+        else:
+            # Running locally - use polling mode
+            logger.info("Starting polling mode for local development")
+            application.run_polling(allowed_updates=Update.ALL_TYPES)
         
     except Exception as e:
         logger.error(f"Failed to start bot: {e}")
