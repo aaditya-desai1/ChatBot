@@ -3,9 +3,9 @@ import os
 import sys
 
 def setup_bot():
-    """Interactive setup for the Cohere AI Telegram bot."""
-    print("Welcome to the Cohere AI Telegram Bot Setup!")
-    print("===========================================")
+    """Interactive setup for the Google Gemini AI Telegram bot."""
+    print("Welcome to the Google Gemini AI Telegram Bot Setup!")
+    print("=================================================")
     
     # Check if config.env exists
     if os.path.exists("config.env"):
@@ -16,12 +16,12 @@ def setup_bot():
             return
     
     # Get API keys
-    cohere_api_key = input("Enter your Cohere API key: ").strip()
+    gemini_api_key = input("Enter your Google Gemini API key: ").strip()
     telegram_token = input("Enter your Telegram Bot Token: ").strip()
     
     # Validate inputs
-    if not cohere_api_key:
-        print("Error: Cohere API key cannot be empty.")
+    if not gemini_api_key:
+        print("Error: Google Gemini API key cannot be empty.")
         return
     
     if not telegram_token:
@@ -30,12 +30,11 @@ def setup_bot():
     
     # Write to config.env
     with open("config.env", "w") as f:
-        f.write(f"COHERE_API_KEY={cohere_api_key}\n")
+        f.write(f"GEMINI_API_KEY={gemini_api_key}\n")
         f.write(f"TELEGRAM_BOT_TOKEN={telegram_token}\n")
     
     print("\nConfiguration saved to config.env")
-    print("\nTo run the basic bot: python bot.py")
-    print("To run the advanced bot with conversation history: python advanced_bot.py")
+    print("\nTo run the bot: python bot.py")
 
 if __name__ == "__main__":
     setup_bot() 

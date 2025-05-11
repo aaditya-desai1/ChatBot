@@ -1,62 +1,74 @@
-# Cohere AI Telegram Chatbot
+# Telegram Chatbot with Google Gemini AI
 
-A simple Telegram chatbot powered by Cohere AI.
+A Telegram chatbot powered by Google's Gemini AI that can engage in natural conversations with users. This bot is designed to be deployed on Render.com's free tier.
 
-## Setup
+## Features
 
-### Automatic Setup
-1. Clone this repository
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-3. Run the setup script:
-   ```
-   python setup.py
-   ```
-4. Follow the prompts to enter your API keys
+- Natural conversation with Google Gemini AI
+- Command handling for /start, /help, and /clear
+- Conversation history tracking for context-aware responses
+- Easy deployment to Render.com
 
-### Manual Setup
-1. Clone this repository
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-3. Edit the `config.env` file with your API keys:
-   - Get a Cohere API key from [cohere.com](https://cohere.com)
-   - Create a Telegram bot and get a token from [BotFather](https://t.me/botfather)
+## Requirements
 
-## Running the Bot
+- Python 3.10+
+- A Telegram bot token (from [BotFather](https://t.me/botfather))
+- A Google Gemini API key (from [Google AI Studio](https://ai.google.dev/))
 
-### Basic Bot
-Run the basic bot with:
+## Installation
+
+1. Clone this repository:
+```
+git clone <your-repository-url>
+cd <repository-directory>
+```
+
+2. Create a virtual environment and install dependencies:
+```
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+3. Create a `config.env` file with your API keys:
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+```
+
+## Running Locally
+
+To run the bot locally:
+
 ```
 python bot.py
 ```
 
-### Advanced Bot (with conversation history)
-Run the advanced bot with:
-```
-python advanced_bot.py
-```
+The bot will start and listen for messages from Telegram users.
+
+## Deployment
+
+For deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Usage
 
-- Start the bot: `/start`
-- Get help: `/help`
-- Reset conversation (advanced bot only): `/reset`
-- End conversation (advanced bot only): `/end`
-- Chat with the bot by sending any message
+Once the bot is running, users can interact with it through Telegram:
 
-## Features
+1. Start a conversation with `/start`
+2. Ask questions or chat naturally
+3. Clear conversation history with `/clear`
+4. Get help with `/help`
 
-### Basic Bot
-- Responds to messages using Cohere's AI models
-- Simple and easy to customize
-- Handles errors gracefully
+## How It Works
 
-### Advanced Bot
-- All features of the basic bot
-- Maintains conversation history for each user
-- Allows resetting or ending conversations
-- Uses conversation history for more contextual responses 
+The bot uses Google's Gemini AI to generate responses to user messages. It maintains conversation history to provide context-aware responses. The bot is built using the python-telegram-bot library and uses Flask to create a simple web server to keep the app alive on Render.com.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) for the Telegram bot framework
+- [Google Gemini AI](https://ai.google.dev/) for the AI capabilities
+- [Flask](https://flask.palletsprojects.com/) for the web server 

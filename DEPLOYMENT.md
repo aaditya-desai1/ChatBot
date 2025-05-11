@@ -6,7 +6,7 @@ This guide explains how to deploy your Telegram bot to Render.com's free tier.
 
 1. A Render.com account (sign up at https://render.com)
 2. Your Telegram bot token (from BotFather)
-3. Your Cohere API key
+3. Your Google Gemini API key (from Google AI Studio)
 
 ## Deployment Steps
 
@@ -28,7 +28,7 @@ First, push your code to GitHub, GitLab, or any other Git provider supported by 
 ### 3. Add Environment Variables
 
 In the "Environment" section, add the following environment variables:
-- `COHERE_API_KEY`: Your Cohere API key
+- `GEMINI_API_KEY`: Your Google Gemini API key
 - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token
 
 ### 4. Deploy
@@ -55,4 +55,4 @@ If your bot isn't working properly:
 1. Check the logs in the Render dashboard
 2. Verify your environment variables are set correctly
 3. Make sure your bot is properly registered with BotFather
-4. Ensure your Cohere API key is valid 
+4. Ensure your Google Gemini API key is valid 

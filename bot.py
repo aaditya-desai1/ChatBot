@@ -1,6 +1,6 @@
 import os
 import logging
-import cohere
+import google.generativeai as genai
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -17,14 +17,15 @@ logger = logging.getLogger(__name__)
 load_dotenv("config.env")
 
 # Get API keys
-COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-# Initialize Cohere client
+# Initialize Gemini client
 try:
-    co = cohere.Client(COHERE_API_KEY)
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception as e:
-    logger.error(f"Failed to initialize Cohere client: {e}")
+    logger.error(f"Failed to initialize Gemini client: {e}")
     raise
 
 # Store conversation history
@@ -39,13 +40,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     conversation_history[user_id] = []
     
     await update.message.reply_text(
-        f"Hi {user.first_name}! I'm a chatbot powered by Cohere AI. How can I help you today?"
+        f"Hi {user.first_name}! I'm a chatbot powered by Google Gemini AI. How can I help you today?"
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     help_text = """
-I'm a chatbot powered by Cohere AI. Here are some things you can do:
+I'm a chatbot powered by Google Gemini AI. Here are some things you can do:
 - Just chat with me naturally
 - Use /start to start a new conversation
 - Use /clear to clear conversation history
@@ -60,7 +61,7 @@ async def clear_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await update.message.reply_text("Conversation history cleared! Let's start fresh.")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle incoming messages and respond using Cohere AI."""
+    """Handle incoming messages and respond using Gemini AI."""
     user_id = update.effective_user.id
     user_message = update.message.text
     
@@ -68,29 +69,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if user_id not in conversation_history:
         conversation_history[user_id] = []
     
-    # Format messages for Cohere's chat API
-    chat_history = [
-        {"role": "System", "message": "You are a helpful and friendly chatbot. Be concise and clear in your responses."}
-    ]
+    # Format messages for Gemini's chat API
+    chat = model.start_chat(history=[])
     
     # Add conversation history
     for msg in conversation_history[user_id][-5:]:
         if msg["role"] == "USER":
-            chat_history.append({"role": "User", "message": msg["message"]})
+            chat.history.append({"role": "user", "parts": [msg["message"]]})
         else:
-            chat_history.append({"role": "Chatbot", "message": msg["message"]})
+            chat.history.append({"role": "model", "parts": [msg["message"]]})
     
     # Let the user know the bot is processing
     processing_message = await update.message.reply_text("Thinking...")
     
     try:
-        # Generate a response using Cohere
-        response = co.chat(
-            message=user_message,
-            model="command",
-            temperature=0.7,
-            chat_history=chat_history
-        )
+        # Generate a response using Gemini
+        response = chat.send_message(user_message)
         
         # Add messages to history
         conversation_history[user_id].append({"role": "USER", "message": user_message})
@@ -100,17 +94,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await processing_message.delete()
         await update.message.reply_text(response.text)
         
-    except cohere.error.CohereError as ce:
-        logger.error(f"Cohere API error: {ce}")
+    except Exception as e:
+        logger.error(f"Gemini API error: {e}")
         await processing_message.delete()
         await update.message.reply_text(
             "I'm having trouble connecting to my AI service. Please try again in a moment."
-        )
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        await processing_message.delete()
-        await update.message.reply_text(
-            "I encountered an unexpected error. My developers have been notified."
         )
 
 # Create a simple Flask web server to keep the app alive on Render
